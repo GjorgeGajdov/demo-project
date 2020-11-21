@@ -5,5 +5,6 @@ module.exports = {
     '<rootDir>/libs/data-access-layout',
     '<rootDir>/libs/domains',
     '<rootDir>/libs/core',
+    '<rootDir>/libs/mock-data',
   ],
 };

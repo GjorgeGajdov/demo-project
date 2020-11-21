@@ -1,8 +1,7 @@
 {
-    "appName": "Mock App",
-    "footer": "",
+    "appName": "Demo App",
     "navItems": {
-        "fileManagement": "File Management"
+        "fileExplorer": "File Explorer"
     },
     "labels": {
         "poweredBy": "Powered by",

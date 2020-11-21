@@ -11,7 +11,7 @@ import { CoreModule } from '@demo-project/core';
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    CoreModule
+    CoreModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent],

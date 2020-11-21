@@ -5,8 +5,8 @@
             <span>{{'appName' | transloco}}</span>
         </button>
 
-        <button *ngFor='let item of navItems$ | async' mat-butto [routerLink]='item.url'>
-            {{item.label}}
+        <button *ngFor='let item of navItems$ | async' mat-button [routerLink]='item.url'>
+            {{item.label | transloco}}
         </button>
     </mat-toolbar-row>
 </mat-toolbar>
