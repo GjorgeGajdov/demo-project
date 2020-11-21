@@ -1,0 +1,11 @@
+{
+    "appName": "Mock App",
+    "footer": "",
+    "navItems": {
+        "fileManagement": "File Management"
+    },
+    "labels": {
+        "poweredBy": "Powered by",
+        "with": "With"
+    }
+}

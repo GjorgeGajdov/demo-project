@@ -29,6 +29,15 @@
     "demo-app-e2e": {
       "tags": [],
       "implicitDependencies": ["demo-app"]
+    },
+    "feature-layout": {
+      "tags": []
+    },
+    "data-access-layout": {
+      "tags": []
+    },
+    "domains": {
+      "tags": []
     }
   }
 }

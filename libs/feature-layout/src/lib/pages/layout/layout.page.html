@@ -1,0 +1,25 @@
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <button mat-button>
+            <mat-icon>code</mat-icon>
+            <span>{{'appName' | transloco}}</span>
+        </button>
+
+        <button *ngFor='let item of navItems$ | async' mat-butto [routerLink]='item.url'>
+            {{item.label}}
+        </button>
+    </mat-toolbar-row>
+</mat-toolbar>
+
+<main>
+    <router-outlet></router-outlet>
+</main>
+
+<footer>
+    <div>
+        <span>{{'labels.poweredBy' | transloco}}&nbsp;</span>
+        <b>gjorgegajdov@gmail.com&nbsp;</b>
+        <span>{{'labels.with' | transloco | lowercase}}&nbsp;</span>
+    </div>
+    <mat-icon>favorite</mat-icon>
+</footer>
