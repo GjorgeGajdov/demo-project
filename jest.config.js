@@ -6,5 +6,7 @@ module.exports = {
     '<rootDir>/libs/domains',
     '<rootDir>/libs/core',
     '<rootDir>/libs/mock-data',
+    '<rootDir>/libs/feature-file-explorer',
+    '<rootDir>/libs/data-access-file-explorer',
   ],
 };

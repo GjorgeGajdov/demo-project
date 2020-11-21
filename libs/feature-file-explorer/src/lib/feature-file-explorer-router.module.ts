@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LayoutPage } from './pages/layout/layout.page';
+import { FileExplorerPage } from './pages/file-explorer/file-explorer.page';
 
 const routes: Routes = [
     {
         path: '',
-        component: LayoutPage
+        component: FileExplorerPage
     }
 ];
 
@@ -13,4 +13,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]
 })
-export class FeatureLayoutRouterModule { }
+export class FeatureFileExplorerRouterModule { }

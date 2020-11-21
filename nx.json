@@ -44,6 +44,12 @@
     },
     "mock-data": {
       "tags": []
+    },
+    "feature-file-explorer": {
+      "tags": []
+    },
+    "data-access-file-explorer": {
+      "tags": []
     }
   }
 }

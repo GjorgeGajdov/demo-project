@@ -88,10 +88,7 @@
               "apps/demo-app/tsconfig.spec.json",
               "apps/demo-app/tsconfig.editor.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/demo-app/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/demo-app/**/*"]
           }
         },
         "test": {
@@ -124,13 +121,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "apps/demo-app-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/demo-app-e2e/**/*"
-            ]
+            "tsConfig": ["apps/demo-app-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/demo-app-e2e/**/*"]
           }
         }
       }
@@ -148,10 +140,7 @@
               "libs/feature-layout/tsconfig.lib.json",
               "libs/feature-layout/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/feature-layout/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/feature-layout/**/*"]
           }
         },
         "test": {
@@ -181,10 +170,7 @@
               "libs/data-access-layout/tsconfig.lib.json",
               "libs/data-access-layout/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/data-access-layout/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/data-access-layout/**/*"]
           }
         },
         "test": {
@@ -214,10 +200,7 @@
               "libs/domains/tsconfig.lib.json",
               "libs/domains/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/domains/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/domains/**/*"]
           }
         },
         "test": {
@@ -242,10 +225,7 @@
               "libs/core/tsconfig.lib.json",
               "libs/core/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/core/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/core/**/*"]
           }
         },
         "test": {
@@ -275,10 +255,7 @@
               "libs/mock-data/tsconfig.lib.json",
               "libs/mock-data/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/mock-data/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/mock-data/**/*"]
           }
         },
         "test": {
@@ -287,6 +264,72 @@
             "jestConfig": "libs/mock-data/jest.config.js",
             "passWithNoTests": true
           }
+        }
+      }
+    },
+    "feature-file-explorer": {
+      "projectType": "library",
+      "root": "libs/feature-file-explorer",
+      "sourceRoot": "libs/feature-file-explorer/src",
+      "prefix": "demo-project",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/feature-file-explorer/tsconfig.lib.json",
+              "libs/feature-file-explorer/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/feature-file-explorer/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-file-explorer/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "data-access-file-explorer": {
+      "projectType": "library",
+      "root": "libs/data-access-file-explorer",
+      "sourceRoot": "libs/data-access-file-explorer/src",
+      "prefix": "demo-project",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/data-access-file-explorer/tsconfig.lib.json",
+              "libs/data-access-file-explorer/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/data-access-file-explorer/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/data-access-file-explorer/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
         }
       }
     }

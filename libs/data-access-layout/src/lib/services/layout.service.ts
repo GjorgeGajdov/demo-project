@@ -6,7 +6,7 @@ import { NavItem } from '@demo-project/domains';
 @Injectable()
 export class LayoutService {
 
-    readonly path = '/api/layout';
+    readonly path = 'api/layout';
 
     constructor(private readonly _http: HttpClient) { }
 
