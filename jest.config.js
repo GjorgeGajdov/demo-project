@@ -4,5 +4,6 @@ module.exports = {
     '<rootDir>/libs/feature-layout',
     '<rootDir>/libs/data-access-layout',
     '<rootDir>/libs/domains',
+    '<rootDir>/libs/core',
   ],
 };

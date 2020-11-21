@@ -20,7 +20,8 @@
       "@demo-project/data-access-layout": [
         "libs/data-access-layout/src/index.ts"
       ],
-      "@demo-project/domains": ["libs/domains/src/index.ts"]
+      "@demo-project/domains": ["libs/domains/src/index.ts"],
+      "@demo-project/core": ["libs/core/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

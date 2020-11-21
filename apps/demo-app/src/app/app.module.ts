@@ -3,7 +3,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
-import { TranslocoRootModule } from './transloco/transloco-root.module';
+import { CoreModule } from '@demo-project/core';
 
 @NgModule({
   declarations: [AppComponent],
@@ -11,7 +11,7 @@ import { TranslocoRootModule } from './transloco/transloco-root.module';
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    TranslocoRootModule
+    CoreModule
   ],
   providers: [],
   bootstrap: [AppComponent],
