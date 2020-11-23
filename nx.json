@@ -50,6 +50,15 @@
     },
     "data-access-file-explorer": {
       "tags": []
+    },
+    "ui-tree": {
+      "tags": []
+    },
+    "utils": {
+      "tags": []
+    },
+    "shared": {
+      "tags": []
     }
   }
 }

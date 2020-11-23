@@ -1,5 +1,52 @@
-<h1>File Explorer</h1>
+<div fxLayout='row'>
+    <div class='ui-tree-wrapper' fxLayout="column">
+        <button mat-raised-button color='primary'>{{'labels.uploadFile' | transloco}}</button>
+        <ui-tree [nodes]='folders$ | async' [selectedNode]='selectedNode$ | async' [compareWith]='compareNodes'
+            (selectedNodeChange)='selectNode($event)'>
+            <!-- <ng-template uiNodeTemplate> -->
+        </ui-tree>
+    </div>
 
-<div *ngFor='let resource of resources$ | async'>
-    {{resource.name}}
+    <div fxFlex fxLayout='column'>
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+            <div fxLayout='row' class='mat-body-2'>
+                <span>Folder 1</span>
+                <mat-icon>keyboard_arrow_right</mat-icon>
+                <span>Sub Folder 1.2</span>
+            </div>
+
+            <div>
+                <mat-form-field>
+                    <input matInput [formControl]='searchCtrl' [placeholder]='"labels.search" | transloco'>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <table mat-table [dataSource]='dataSource$ | async' matSort>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'labels.name' | transloco}}</th>
+                <td mat-cell *matCellDef="let element">{{element.name}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="size">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'labels.size' | transloco}}</th>
+                <td mat-cell *matCellDef="let element">{{element.size}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'labels.type' | transloco}}</th>
+                <td mat-cell *matCellDef="let element">{{element.type}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dateCreated">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'labels.dateCreated' | transloco}}</th>
+                <td mat-cell *matCellDef="let element">{{element.dateCreated | date:'short'}}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSize]='10' [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
 </div>

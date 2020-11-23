@@ -14,44 +14,41 @@ const navItems = [
 
 const resources = (function () {
     const result = [];
-    let folderId = 1;
-    let fileId = 1;
+    let folderId = 0;
+    let fileId = 0;
 
-    const insertChildren = () => {
+    const createNode = (id, name, type, children) => ({
+        id: id,
+        name: name,
+        type: type,
+        dateCreated: new Date(),
+        hidden: false,
+        size: type === 'FOLDER' ? 0 : Math.round(Math.random() * 10000000),
+        children: children
+    })
+
+    const getChildren = () => {
         const children = [];
-        for (let i = 1; i <= 5; i++) {
-            children.push({
-                id: fileId,
-                name: `Sub File ${i}`,
-                type: 'FILE',
-                size: Math.round(Math.random() * 10000000)
-            })
+        for (let i = 1; i <= 15; i++) {
+            if (i % 2 === 0) {
+                folderId++;
+                children.push(createNode(folderId, `Sub Folder ${folderId}`, 'FOLDER'));
+
+            } else {
+                fileId++;
+                children.push(createNode(fileId, `Sub File ${fileId}`, 'FILE'));
+            }
         }
-        fileId++;
         return children;
     }
 
     for (let i = 1; i <= 20; i++) {
         if (i % 2 === 0) {
-            result.push({
-                id: folderId,
-                name: `Folder ${folderId}`,
-                type: 'FOLDER',
-                size: 0,
-                hidden: false,
-                children: insertChildren()
-            });
             folderId++;
+            result.push(createNode(folderId, `Folder ${folderId}`, 'FOLDER', getChildren()));
         } else {
-            result.push({
-                id: fileId,
-                name: `${'File'} ${fileId}`,
-                type: 'FILE',
-                size: Math.round(Math.random() * 10000000),
-                hidden: false,
-                children: []
-            });
             fileId++;
+            result.push(createNode(fileId, `File ${fileId}`, 'FILE'));
         }
     }
 

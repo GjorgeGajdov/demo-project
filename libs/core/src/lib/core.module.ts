@@ -12,7 +12,7 @@ const modules = [
 export class CoreModule {
 
   constructor(@Optional() @SkipSelf() module: CoreModule) {
-    if (module) { throw new Error('CoreModule is already loaded!'); }
+    if (module) { throw new Error('CoreModule is already imported. CoreModel should only be imported once in AppModule.'); }
   }
 
   static forRoot(config = {}): ModuleWithProviders<CoreModule> {

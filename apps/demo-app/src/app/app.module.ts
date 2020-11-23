@@ -13,7 +13,7 @@ import { FeatureLayoutModule } from '@demo-project/feature-layout';
     AppRoutingModule,
     HttpClientModule,
     CoreModule.forRoot(),
-    FeatureLayoutModule
+    FeatureLayoutModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent],

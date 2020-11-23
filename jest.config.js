@@ -8,5 +8,9 @@ module.exports = {
     '<rootDir>/libs/mock-data',
     '<rootDir>/libs/feature-file-explorer',
     '<rootDir>/libs/data-access-file-explorer',
+    '<rootDir>/libs/ui-tree',
+    '<rootDir>/libs/utils',
+    '<rootDir>/libs/common',
+    '<rootDir>/libs/shared',
   ],
 };

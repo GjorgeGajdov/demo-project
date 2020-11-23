@@ -5,6 +5,12 @@
     },
     "labels": {
         "poweredBy": "Powered by",
-        "with": "With"
+        "with": "With",
+        "search": "Search",
+        "name": "Name",
+        "type": "Type",
+        "size": "Size",
+        "dateCreated": "dateCreated",
+        "uploadFile": "Upload File"
     }
 }

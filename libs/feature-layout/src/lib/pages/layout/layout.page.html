@@ -1,4 +1,6 @@
-<mat-toolbar color="primary">
+<mat-progress-bar *ngIf='loading$ | async' mode="indeterminate" color='accent'></mat-progress-bar>
+
+<mat-toolbar class="mat-elevation-z8" color="primary">
     <mat-toolbar-row>
         <button mat-button routerLink=''>
             <mat-icon>code</mat-icon>
