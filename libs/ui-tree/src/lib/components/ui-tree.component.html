@@ -1,6 +1,7 @@
-<div *ngFor='let node of nodes' mat-ripple class='tree-node' [class.selected]='isSelected(node)'
-    [style.paddingLeft.px]='node.level * 25' (click)='selectNode(node)'>
-    <button *ngIf='node.expandable' mat-icon-button (click)='toggleNode(node)'>
+<div *ngFor='let node of displayedNodes$ | async' mat-ripple class='tree-node' fxLayout="row"
+    fxLayoutAlign="start center" [class.selected]='isSelected(node)' [style.paddingLeft.px]='node.level * 25'
+    (click)='selectNode(node)'>
+    <button *ngIf='node.expandable' mat-icon-button (click)='toggleNode($event, node)'>
         <mat-icon>
             {{isExpanded(node) ? 'keyboard_arrow_down' : 'keyboard_arrow_right'}}
         </mat-icon>

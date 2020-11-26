@@ -10,7 +10,18 @@
         "name": "Name",
         "type": "Type",
         "size": "Size",
-        "dateCreated": "dateCreated",
-        "uploadFile": "Upload File"
+        "dateCreated": "Date Created",
+        "uploadFile": "Upload File",
+        "submit": "Submit",
+        "folder": "Folder",
+        "shortcutReference": "Shortcut Reference",
+        "edit": "Edit",
+        "clone": "Clone",
+        "delete": "Delete"
+    },
+    "messages": {
+        "successfullyUploadFile": "Successfully uploaded file",
+        "successfullyClonedFile": "Successfully cloned file",
+        "successfullyDeletedFile": "Successfully deleted file"
     }
 }

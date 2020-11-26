@@ -1,0 +1,37 @@
+<form [formGroup]='form' fxLayout='column' (ngSubmit)='submit()'>
+    <mat-form-field>
+        <input matInput [placeholder]='"labels.name" | transloco' formControlName='name'>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-select [placeholder]='"labels.type" | transloco' formControlName='type'>
+            <mat-option *ngFor='let type of resourceTypes$ | async' [value]='type'>
+                {{type | titlecase}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-select [placeholder]='"labels.folder" | transloco' formControlName='parentId'>
+            <mat-option [value]='null'>--</mat-option>
+            <mat-option *ngFor='let folder of folders$ | async' [value]='folder.data.id'
+                [style.marginLeft.px]='folder.level * 25'>
+                {{folder.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field *ngIf='form.get("type").value === resourceType.SHORTCUT'>
+        <mat-select [placeholder]='"labels.shortcutReference" | transloco' formControlName='shortcutRefId'>
+            <mat-option [value]='null'>--</mat-option>
+            <mat-option *ngFor='let folder of folders$ | async' [value]='folder.data.id'
+                [style.marginLeft.px]='folder.level * 25'>
+                {{folder.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color='primary' [disabled]='form.invalid'>
+        {{'labels.submit' | transloco}}
+    </button>
+</form>

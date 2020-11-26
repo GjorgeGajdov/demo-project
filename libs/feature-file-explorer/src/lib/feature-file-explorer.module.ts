@@ -8,9 +8,20 @@ import { UiTreeModule } from '@demo-project/ui-tree';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { TranslocoModule } from '@ngneat/transloco';
 import { ReactiveFormsModule } from '@angular/forms';
+import { UploadFileComponent } from './components/upload-file/upload-file.component';
+import { UploadFileDialog } from './dialogs/upload-file/upload-file.dialog';
+import { ResizableModule } from 'angular-resizable-element';
 
 const pages = [
   FileExplorerPage
+];
+
+const components = [
+  UploadFileComponent
+];
+
+const dialogs = [
+  UploadFileDialog
 ];
 
 @NgModule({
@@ -22,8 +33,9 @@ const pages = [
     UiTreeModule,
     FlexLayoutModule,
     TranslocoModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ResizableModule
   ],
-  declarations: [...pages]
+  declarations: [...pages, ...components, ...dialogs]
 })
 export class FeatureFileExplorerModule { }

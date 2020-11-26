@@ -1,6 +1,9 @@
-import { ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
+import { EventEmitter, OnDestroy, Output } from '@angular/core';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TreeFlatNode } from '@demo-project/domains';
+import { BehaviorSubject, Observable, combineLatest, Subject } from 'rxjs';
+import { map, takeUntil, take } from 'rxjs/operators';
+import { treeFlatNodeFindAllParents } from '@demo-project/utils';
 
 @Component({
     selector: 'ui-tree',
@@ -8,48 +11,105 @@ import { TreeFlatNode } from '@demo-project/domains';
     styleUrls: ['./ui-tree.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UiTreeComponent {
+export class UiTreeComponent implements OnDestroy {
 
-    @Input() nodes: TreeFlatNode[];
-    @Input() selectedNode: TreeFlatNode;
-
-    @Input() set expandedNodes(value: TreeFlatNode[]) {
-        this._expandedNodes = Array.isArray(value) ? value : [];
+    @Input() set nodes(value: TreeFlatNode[]) {
+        this._nodesSubject.next(Array.isArray(value) ? value : []);
     }
-    get expandedNodes() { return this._expandedNodes; }
-    private _expandedNodes: TreeFlatNode[] = [];
+    private readonly _nodesSubject = new BehaviorSubject<TreeFlatNode[]>([]);
 
+    @Input() set selectedNode(value: TreeFlatNode) {
+        this._selectedNodeSubject.next(value);
+    }
+    get selectedNode(): TreeFlatNode { return this._selectedNodeSubject.value; }
+    private readonly _selectedNodeSubject = new BehaviorSubject<TreeFlatNode>(null);
+
+    get expandedNodes(): Set<TreeFlatNode> { return this._expandedNodesSubject.value; }
+    private readonly _expandedNodesSubject = new BehaviorSubject<Set<TreeFlatNode>>(new Set<TreeFlatNode>());
+
+    /** Function that compare two nodes, based on custom implementation. */
     @Input() compareWith: (node1: TreeFlatNode, node2: TreeFlatNode) => boolean;
 
     @Output() selectedNodeChange = new EventEmitter<TreeFlatNode>();
 
-    constructor(private readonly _cdr: ChangeDetectorRef) { }
+    readonly displayedNodes$: Observable<TreeFlatNode[]>;
 
-    toggleNode(node: TreeFlatNode) {
-        const index = this.expandedNodes.indexOf(node);
-        if (index > -1) {
-            this.expandedNodes.splice(index, 1);
+    private readonly _unsubscribe = new Subject();
+
+    constructor() {
+        this.displayedNodes$ = combineLatest([
+            this._nodesSubject,
+            this._expandedNodesSubject
+        ]).pipe(
+            takeUntil(this._unsubscribe),
+            map(([nodes, _]) => {
+                if (nodes.length === 0) { return []; }
+                const result = [nodes[0]];
+                let lastInsertedNode = nodes[0];
+
+                for (let i = 1; i < nodes.length; i++) {
+                    const n = nodes[i];
+
+                    // check if current node level is equal or less than previous node level
+                    const isEqualOrLess = n.level <= lastInsertedNode.level;
+
+                    // check is current node level is greater and previous node is expanded
+                    const isGreatOrExpanded = n.level > lastInsertedNode.level && this.isExpanded(lastInsertedNode);
+
+                    if (isEqualOrLess || isGreatOrExpanded) {
+                        result.push(n);
+                        lastInsertedNode = n;
+                    }
+                }
+
+                return result;
+            })
+        );
+
+        // when nodes or selected on changes, find all parent nodes for the selected node and expands them
+        combineLatest([
+            this._nodesSubject,
+            this._selectedNodeSubject
+        ]).pipe(
+            takeUntil(this._unsubscribe),
+        ).subscribe(([nodes, selectedNode]) => {
+            const nodeRef = nodes.find(n => this._compareNodes(n, selectedNode));
+            treeFlatNodeFindAllParents(nodeRef, nodes).forEach(n => this.expandedNodes.add(n));
+            this._expandedNodesSubject.next(new Set(this.expandedNodes));
+        });
+    }
+
+    ngOnDestroy() {
+        this._unsubscribe.next();
+        this._unsubscribe.complete();
+    }
+
+    toggleNode(event: MouseEvent, node: TreeFlatNode) {
+        event.stopPropagation();
+        if (this.expandedNodes.has(node)) {
+            this.expandedNodes.delete(node)
         } else {
-            this.expandedNodes.push(node);
+            this.expandedNodes.add(node);
         }
-
-        this._cdr.markForCheck();
+        this._expandedNodesSubject.next(this.expandedNodes);
     }
 
     isExpanded(node: TreeFlatNode): boolean {
-        return this.expandedNodes?.includes(node);
+        return this.expandedNodes.has(node);
     }
 
     isSelected(node: TreeFlatNode): boolean {
-        if (!this.selectedNode) { return false; }
-        if (this.compareWith) {
-            return this.compareWith(this.selectedNode, node);
-        }
-        return node === this.selectedNode;
+        return this._compareNodes(this.selectedNode, node);
     }
 
     selectNode(node: TreeFlatNode) {
-        this.selectedNode = node;
+        this._selectedNodeSubject.next(node);
         this.selectedNodeChange.emit(node);
+    }
+
+    private _compareNodes(node1: TreeFlatNode, node2: TreeFlatNode): boolean {
+        if (!node1 || !node2) { return false; }
+        if (this.compareWith) { return this.compareWith(node1, node2); }
+        return node1 === node2;
     }
 }

@@ -30,8 +30,7 @@
         "libs/data-access-file-explorer/src/index.ts"
       ],
       "@demo-project/ui-tree": ["libs/ui-tree/src/index.ts"],
-      "@demo-project/utils": ["libs/utils/src/index.ts"],
-      "@demo-project/shared": ["libs/shared/src/index.ts"]
+      "@demo-project/utils": ["libs/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -10,7 +10,6 @@ module.exports = {
     '<rootDir>/libs/data-access-file-explorer',
     '<rootDir>/libs/ui-tree',
     '<rootDir>/libs/utils',
-    '<rootDir>/libs/common',
-    '<rootDir>/libs/shared',
+    '<rootDir>/libs/common'
   ],
 };

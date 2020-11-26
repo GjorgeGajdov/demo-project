@@ -1,0 +1,12 @@
+<div mat-dialog-title>
+    <div fxLayout='row' fxLayoutAlign='space-between center'>
+        <h2>{{'labels.uploadFile' | transloco}}</h2>
+        <button mat-icon-button mat-dialog-close>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+</div>
+
+<mat-dialog-content>
+    <feature-upload-file [resource]='data.resource'></feature-upload-file>
+</mat-dialog-content>
