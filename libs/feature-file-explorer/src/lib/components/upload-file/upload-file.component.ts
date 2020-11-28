@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/c
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FileExplorerStoreService } from '@demo-project/data-access-file-explorer';
-import { FlatResource, ResourceType } from '@demo-project/domains';
+import { FlatResource, ResourceType, TreeFlatNode } from '@demo-project/domains';
 import { resourceParentFolderValidator } from '@demo-project/utils';
-import { Observable, of, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject, combineLatest } from 'rxjs';
+import { map, startWith, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'feature-upload-file',
@@ -18,10 +18,13 @@ export class UploadFileComponent implements OnDestroy {
     @Input() set resource(value: FlatResource) {
         if (value) {
             this.form.patchValue(value);
+            if (value.id) {
+                this.form.get('type')
+            }
         }
     }
 
-    readonly folders$ = this._store.folders$;
+    readonly folders$: Observable<TreeFlatNode<FlatResource>[]>;
     readonly resourceTypes$: Observable<string[]>;
 
     readonly form: FormGroup;
@@ -35,7 +38,7 @@ export class UploadFileComponent implements OnDestroy {
         private readonly _dialogRef: MatDialogRef<UploadFileComponent>
     ) {
         this.form = this._builder.group({
-            id: [],
+            id: [null],
             name: [null, Validators.required],
             type: [null, Validators.required],
             dateCreated: [new Date(), Validators.required],
@@ -43,6 +46,17 @@ export class UploadFileComponent implements OnDestroy {
         });
 
         this.resourceTypes$ = of(Object.keys(ResourceType));
+        this.folders$ = combineLatest([
+            this._store.foldersAndShortcuts$,
+            this.form.get('id').valueChanges.pipe(startWith(this.form.value.id))
+        ]).pipe(
+            takeUntil(this._unsubscribe),
+            map(([foldersAndShortcuts, id]) => {
+                // TODO: filter current node and all of it's children from the folder response
+                // we don't want a folder to be able to choose him self as a parent
+                return foldersAndShortcuts.filter(it => it.data.type === ResourceType.FOLDER);
+            })
+        );
 
         this.form.get('type').valueChanges.pipe(
             takeUntil(this._unsubscribe),
@@ -65,7 +79,8 @@ export class UploadFileComponent implements OnDestroy {
 
     submit() {
         if (this.form.valid) {
-            this._store.saveOrUpdateNode(this.form.value);
+            // raw value, because value does not return disabled values
+            this._store.saveOrUpdateNode(this.form.getRawValue());
             this._dialogRef.close();
         }
     }

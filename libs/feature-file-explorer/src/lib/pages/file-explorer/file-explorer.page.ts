@@ -28,7 +28,7 @@ export class FileExplorerPage implements OnDestroy {
 
     readonly nodes$: Observable<TreeFlatNode<FlatResource>[]> = this._store.nodes$;
     readonly selectedNode$: Observable<TreeFlatNode<FlatResource>> = this._store.selectedNode$;
-    readonly folders$: Observable<TreeFlatNode<FlatResource>[]> = this._store.folders$;
+    readonly foldersAndShortcuts$: Observable<TreeFlatNode<FlatResource>[]> = this._store.foldersAndShortcuts$;
     readonly breadcrumbs$ = this._store.breadcrumbs$;
     readonly dataSource$: Observable<MatTableDataSource<FlatResource>>;
 
@@ -72,7 +72,7 @@ export class FileExplorerPage implements OnDestroy {
 
         combineLatest([
             this._route.queryParamMap,
-            this.folders$.pipe(notEmpty())
+            this.foldersAndShortcuts$.pipe(notEmpty())
         ]).pipe(
             takeUntil(this._unsubscribe),
             take(1)
@@ -95,7 +95,7 @@ export class FileExplorerPage implements OnDestroy {
 
     selectNode(node: TreeFlatNode<FlatResource>) {
         if (node.data.type === ResourceType.SHORTCUT) {
-            this._store.folders$.subscribe(nodes => {
+            this._store.foldersAndShortcuts$.subscribe(nodes => {
                 const nodeRef = nodes.find(n => n.data.id === node.data.shortcutRefId);
                 this._store.updateSelectedNode(nodeRef);
                 this._router.navigate([], {
@@ -131,8 +131,7 @@ export class FileExplorerPage implements OnDestroy {
     }
 
     resizeEnd(event: ResizeEvent) {
-        this.uiTreeWidth = event.rectangle.width;
-        console.log('Element was resized', event);
+        this.uiTreeWidth = Math.max(111, event.rectangle.width);
     }
 
     getResourceIcon(resource: FlatResource): string {

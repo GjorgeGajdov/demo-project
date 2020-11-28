@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FlatResource, ResourceType, TreeFlatNode } from '@demo-project/domains';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { FileExplorerService } from './file-explorer.service';
-import { mapFlatResourceToTreeFlatNode, mapResourcesToTreeFlatNodes, treeFlatNodeFindAllChildren, treeFlatNodeFindAllParents } from '@demo-project/utils';
+import { insertAtIndex, mapFlatResourceToTreeFlatNode, mapResourcesToTreeFlatNodes, treeFlatNodeFindAllChildren, treeFlatNodeFindAllParents } from '@demo-project/utils';
 import { map } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoService } from '@ngneat/transloco';
@@ -18,23 +18,23 @@ export class FileExplorerStoreService {
     readonly selectedNode$: Observable<TreeFlatNode<FlatResource>> = this._selectedNodeSubject.asObservable();
     readonly breadcrumbs$: Observable<string[]>;
 
-    readonly folders$: Observable<TreeFlatNode<FlatResource>[]>;
+    readonly foldersAndShortcuts$: Observable<TreeFlatNode<FlatResource>[]>;
 
     constructor(
         private readonly _service: FileExplorerService,
         private readonly _snackBar: MatSnackBar,
         private readonly _transloco: TranslocoService
     ) {
-        this.folders$ = this.nodes$.pipe(
+        this.foldersAndShortcuts$ = this.nodes$.pipe(
             map(nodes => nodes.filter(n => [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(n.data.type)))
         );
 
+        // breadcrumbs are a combination for selected node and all of his parent nodes
         this.breadcrumbs$ = this.selectedNode$.pipe(
             map(node => {
                 return [
                     node?.name,
-                    ...treeFlatNodeFindAllParents<FlatResource>(node, this._nodesSubject.value)
-                        .map(n => n.name)
+                    ...treeFlatNodeFindAllParents<FlatResource>(node, this._nodesSubject.value).map(n => n.name)
                 ];
             })
         );
@@ -50,31 +50,42 @@ export class FileExplorerStoreService {
         this._selectedNodeSubject.next(node);
     }
 
+    /** If the resource has 'id' updates the resource and it's children, else inserts the resource (mapped as node) */
     saveOrUpdateNode(resource: FlatResource) {
-        // temporary simulation until API calls are implemented
+        // TODO: refactor this after API calls are implemented
+        // this temporary simulation until API calls are implemented
+
+        // find node reference
+        const node = this._nodesSubject.value.find(n => n.data.id === resource.id);
+        const nodeIndex = this._nodesSubject.value.findIndex(n => n.data.id === resource.id);
+        const parentNode = this._nodesSubject.value.find(n => n.data.id === resource.parentId);
+        const parentNodeIndex = this._nodesSubject.value.indexOf(parentNode);
+
+        const nodeLevel = parentNode ? parentNode.level + 1 : 0;
+        const expandable = resource.id ? node.expandable : false;
+
+        // TODO: check if name already present in parent node children, 
+        // and it's present use the '_getCloneName' method to update the name with the right Copy(number)
+        const newNode = mapFlatResourceToTreeFlatNode(resource, nodeLevel, expandable);
+
+        // if node has 'resource.id' this is update
         if (resource.id) {
-            const node = this._nodesSubject.value.find(n => n.data.id === resource.id);
-            const index = this._nodesSubject.value.indexOf(node);
-            node.name = resource.name;
-            node.data = resource;
-            this._nodesSubject.next(this._nodesSubject.value);
-        } else {
-            const parentNode = this._nodesSubject.value.find(n => n.data.id === resource.parentId);
-            const index = this._nodesSubject.value.indexOf(parentNode);
-            const level = parentNode ? parentNode.level + 1 : 0;
-
-            if (parentNode && [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(resource.type)) {
-                parentNode.expandable = true
+            // if node 'parentId' is not updated, all we have to do is to update the current node with the newNode
+            if (node.data.parentId === newNode.data.parentId) {
+                this._replaceNode(nodeIndex, newNode)
             }
-
-            const node = mapFlatResourceToTreeFlatNode(resource, level, false);
-
-            node.data.id = resource.id || Math.round(Math.random() * 10000000);
-            this._nodesSubject.next([
-                ...this._nodesSubject.value.slice(0, index + 1),
-                node,
-                ...this._nodesSubject.value.slice(index + 1)
-            ]);
+            // if node 'parentId' is updated will need to update the children as well
+            else {
+                this._updateNode(node, newNode, parentNodeIndex)
+            }
+        } else {
+            // if this node has parent node and this node is the first children
+            // update parent node 'expandable' to true
+            if (parentNode && [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(resource.type)) {
+                parentNode.expandable = true;
+            }
+            newNode.data.id = resource.id || this._randomId; // simulate new id
+            this._nodesSubject.next(insertAtIndex(this._nodesSubject.value, parentNodeIndex + 1, newNode));
         }
 
         this._snackBar.open(`${this._transloco.translate('messages.successfullyUploadFile')}!`, null, {
@@ -82,20 +93,52 @@ export class FileExplorerStoreService {
         });
     }
 
-    cloneNode(node: TreeFlatNode) {
-        // temporary simulation until API calls are implemented
+    cloneNode(node: TreeFlatNode<FlatResource>) {
+        // TODO: refactor this after API calls are implemented
+        // this temporary simulation until API calls are implemented
 
-        // clone node
-        // copy (1) to name,
-        // find all children
+        const newName = this._getCloneName(node.name, node.data.parentId);
+        const newNode: TreeFlatNode<FlatResource> = {
+            ...node,
+            name: newName,
+            data: {
+                ...node.data,
+                id: this._randomId,
+                name: newName,
+                dateCreated: new Date(),
+            }
+        };
+
+        const newNodes = [newNode];
+
+        // clone children and update their 'id' & 'parentId'
+        if (newNode.data.type === ResourceType.FOLDER) {
+            const children = treeFlatNodeFindAllChildren<FlatResource>(node, this._nodesSubject.value)
+                .map(c => ({
+                    ...c,
+                    data: {
+                        ...c.data,
+                        id: this._randomId,
+                        parentId: newNode.data.id
+                    }
+                }));
+
+            newNodes.push(...children);
+        }
+
+        const parentNode = this._nodesSubject.value.find(n => n.data.id === node.data.parentId);
+        const parentNodeIndex = this._nodesSubject.value.indexOf(parentNode);
+
+        // insert cloned nodes after parent
+        this._nodesSubject.next(insertAtIndex(this._nodesSubject.value, parentNodeIndex + 1, newNodes));
 
         this._snackBar.open(`${this._transloco.translate('messages.successfullyClonedFile')}!`, null, {
             duration: 2000,
         });
     }
 
-    deleteNode(node: TreeFlatNode) {
-        // temporary simulation until API calls are implemented
+    /** Deletes the node and all the children for the node. */
+    deleteNode(node: TreeFlatNode<FlatResource>) {
         const deletedNodes = [
             ...treeFlatNodeFindAllChildren<FlatResource>(node, this._nodesSubject.value),
             node,
@@ -105,8 +148,69 @@ export class FileExplorerStoreService {
             this._nodesSubject.value.filter(n => deletedNodes.indexOf(n) === -1)
         );
 
+        // TODO: implement API calls
         this._snackBar.open(`${this._transloco.translate('messages.successfullyDeletedFile')}!`, null, {
             duration: 2000,
         });
+    }
+
+    /** Remove this when API calls are implemented. */
+    private get _randomId(): number { return Math.round(Math.random() * 10000000); }
+
+    /** 
+     * Search for 'name' in 'parentId' child nodes and if name is present,
+     * returns a new 'name' with Copy in the name
+     */
+    private _getCloneName(name: string, parentId: number): string {
+        const index = this._nodesSubject.value
+            .findIndex(n => n.data.parentId === parentId && n.name.includes(`${name} Copy (`));
+        if (index > -1) {
+            const existingName = this._nodesSubject.value[index].name;
+            const startIndex = existingName.indexOf('Copy (') + 6; // + 6 because the length of 'Copy (' is 6
+            const numberOfCopies = +existingName.substring(startIndex, existingName.lastIndexOf(')'));
+            return `${existingName.substring(0, startIndex - 6)} Copy (${numberOfCopies + 1})`;
+        }
+        return `${name} Copy (1)`;
+    }
+
+    private _replaceNode(oldNodeIndex: number, newNode: TreeFlatNode<FlatResource>) {
+        this._nodesSubject.value[oldNodeIndex] = newNode;
+        this._nodesSubject.next(this._nodesSubject.value);
+    }
+
+    private _updateNode(
+        oldNode: TreeFlatNode<FlatResource>,
+        newNode: TreeFlatNode<FlatResource>,
+        parentNodeIndex: number
+    ) {
+        // store children for a later usage
+        let children = treeFlatNodeFindAllChildren(oldNode, this._nodesSubject.value);
+
+        // delete node
+        this.deleteNode(oldNode);
+
+        // difference between previous node level and new node level
+        // this is important if parent folder is updated
+        const levelDiff = oldNode.level - newNode.level;
+
+        // update child nodes level
+        children = children.map(c => ({ ...c, level: c.level - levelDiff }));
+
+        // merge newNode with updated child nodes
+        const newNodes = [newNode, ...children];
+
+        // finds the previous parent node
+        const prevNodeParent = this._nodesSubject.value.find(n => n.data.id === oldNode.data.parentId);
+
+        // find all child nodes of the previous parent node
+        const parentNodeChildFolders = treeFlatNodeFindAllChildren(prevNodeParent, this._nodesSubject.value)
+            .filter(n => [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(n.data.type));
+        // if parent node has no child folders update 'expandable' to true
+        if (parentNodeChildFolders.length === 0) {
+            prevNodeParent.expandable = false;
+        }
+
+        const result = insertAtIndex(this._nodesSubject.value, parentNodeIndex + 1, newNodes);
+        this._nodesSubject.next(result);
     }
 }

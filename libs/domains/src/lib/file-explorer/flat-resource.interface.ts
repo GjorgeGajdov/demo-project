@@ -5,7 +5,7 @@ export interface FlatResource {
     name: string;
     type: ResourceType;
     size: number;
-    dateCreated: boolean;
+    dateCreated: Date;
     parentId: number;
     // this value is present only if type is 'SHORTCUT', and references to a specific Resource 'id'
     shortcutRefId?: number;

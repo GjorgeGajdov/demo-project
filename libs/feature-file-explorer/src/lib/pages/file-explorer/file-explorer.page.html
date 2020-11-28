@@ -3,8 +3,8 @@
         [enableGhostResize]="true" (resizeEnd)='resizeEnd($event)'>
         <button mat-raised-button color='primary' class='upload-button'
             (click)='openDialog()'>{{'labels.uploadFile' | transloco}}</button>
-        <ui-tree [nodes]='folders$ | async' [selectedNode]='selectedNode$ | async' [compareWith]='compareNodes'
-            (selectedNodeChange)='selectNode($event)'>
+        <ui-tree [nodes]='foldersAndShortcuts$ | async' [selectedNode]='selectedNode$ | async'
+            [compareWith]='compareNodes' (selectedNodeChange)='selectNode($event)'>
             <!-- <ng-template uiNodeTemplate> -->
         </ui-tree>
 

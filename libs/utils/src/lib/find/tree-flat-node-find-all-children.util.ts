@@ -6,16 +6,17 @@ export function treeFlatNodeFindAllChildren<T = any>(node: TreeFlatNode<T>, node
     const result = [];
     const minLevel = node.level;
 
-    let index = nodes.indexOf(node);
+    const nodeIndex = nodes.indexOf(node);
     // this is the last node return empty array
-    if (index === nodes.length - 1) { return []; }
+    if (nodeIndex === nodes.length - 1) { return []; }
 
-    let level = nodes[index + 1].level;
+    let currentIndex = nodeIndex + 1;
+    let level = nodes[currentIndex + 1].level;
 
     while (minLevel < level) {
-        index++;
-        result.push(nodes[index]);
-        level = nodes[index].level;
+        result.push(nodes[currentIndex]);
+        currentIndex++;
+        level = nodes[currentIndex] ? nodes[currentIndex].level : 0;
     }
 
     return result;
