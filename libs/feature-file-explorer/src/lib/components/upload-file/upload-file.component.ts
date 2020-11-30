@@ -78,10 +78,8 @@ export class UploadFileComponent implements OnDestroy {
     }
 
     submit() {
-        if (this.form.valid) {
-            // raw value, because value does not return disabled values
-            this._store.saveOrUpdateNode(this.form.getRawValue());
-            this._dialogRef.close();
-        }
+        // 'getRawValue()', because value does not return disabled values
+        this._store.saveOrUpdateNode(this.form.getRawValue());
+        this._dialogRef.close();
     }
 }

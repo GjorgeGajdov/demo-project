@@ -53,7 +53,7 @@ export class UiTreeComponent implements OnDestroy {
                     // check if current node level is equal or less than previous node level
                     const isEqualOrLess = n.level <= lastInsertedNode.level;
 
-                    // check is current node level is greater and previous node is expanded
+                    // check is current node level is greater than previous node is expanded
                     const isGreatOrExpanded = n.level > lastInsertedNode.level && this.isExpanded(lastInsertedNode);
 
                     if (isEqualOrLess || isGreatOrExpanded) {
@@ -66,7 +66,7 @@ export class UiTreeComponent implements OnDestroy {
             })
         );
 
-        // when nodes or selected on changes, find all parent nodes for the selected node and expands them
+        // when nodes or selectedNode changes, find all parent nodes for the selected node and expands them
         combineLatest([
             this._nodesSubject,
             this._selectedNodeSubject
@@ -82,6 +82,9 @@ export class UiTreeComponent implements OnDestroy {
     ngOnDestroy() {
         this._unsubscribe.next();
         this._unsubscribe.complete();
+        this._nodesSubject.complete();
+        this._selectedNodeSubject.complete();
+        this._expandedNodesSubject.complete();
     }
 
     toggleNode(event: MouseEvent, node: TreeFlatNode) {

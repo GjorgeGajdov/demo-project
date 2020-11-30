@@ -29,7 +29,7 @@ export class FileExplorerStoreService {
             map(nodes => nodes.filter(n => [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(n.data.type)))
         );
 
-        // breadcrumbs are a combination for selected node and all of his parent nodes
+        // the breadcrumbs are a combination of selected node and all of it's parent nodes
         this.breadcrumbs$ = this.selectedNode$.pipe(
             map(node => {
                 return [
@@ -53,7 +53,7 @@ export class FileExplorerStoreService {
     /** If the resource has 'id' updates the resource and it's children, else inserts the resource (mapped as node) */
     saveOrUpdateNode(resource: FlatResource) {
         // TODO: refactor this after API calls are implemented
-        // this temporary simulation until API calls are implemented
+        // this is temporary simulation until API calls are implemented
 
         // find node reference
         const node = this._nodesSubject.value.find(n => n.data.id === resource.id);
@@ -64,8 +64,8 @@ export class FileExplorerStoreService {
         const nodeLevel = parentNode ? parentNode.level + 1 : 0;
         const expandable = resource.id ? node.expandable : false;
 
-        // TODO: check if name already present in parent node children, 
-        // and it's present use the '_getCloneName' method to update the name with the right Copy(number)
+        // TODO: check if name is already present in the parent's children, 
+        // if node name is present use '_getCloneName' method to update the name with the right Copy(number)
         const newNode = mapFlatResourceToTreeFlatNode(resource, nodeLevel, expandable);
 
         // if node has 'resource.id' this is update
@@ -79,8 +79,7 @@ export class FileExplorerStoreService {
                 this._updateNode(node, newNode, parentNodeIndex)
             }
         } else {
-            // if this node has parent node and this node is the first children
-            // update parent node 'expandable' to true
+            // if this node is placed as a first child, update 'expandable' to for the parent
             if (parentNode && [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(resource.type)) {
                 parentNode.expandable = true;
             }
@@ -95,7 +94,7 @@ export class FileExplorerStoreService {
 
     cloneNode(node: TreeFlatNode<FlatResource>) {
         // TODO: refactor this after API calls are implemented
-        // this temporary simulation until API calls are implemented
+        // this is temporary simulation until API calls are implemented
 
         const newName = this._getCloneName(node.name, node.data.parentId);
         const newNode: TreeFlatNode<FlatResource> = {
@@ -193,7 +192,7 @@ export class FileExplorerStoreService {
         // this is important if parent folder is updated
         const levelDiff = oldNode.level - newNode.level;
 
-        // update child nodes level
+        // update child nodes' level
         children = children.map(c => ({ ...c, level: c.level - levelDiff }));
 
         // merge newNode with updated child nodes
@@ -205,7 +204,7 @@ export class FileExplorerStoreService {
         // find all child nodes of the previous parent node
         const parentNodeChildFolders = treeFlatNodeFindAllChildren(prevNodeParent, this._nodesSubject.value)
             .filter(n => [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(n.data.type));
-        // if parent node has no child folders update 'expandable' to true
+        // if the previous parent node has no child folders update 'expandable' to false
         if (parentNodeChildFolders.length === 0) {
             prevNodeParent.expandable = false;
         }
