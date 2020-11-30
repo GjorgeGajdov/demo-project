@@ -94,22 +94,11 @@ export class FileExplorerPage implements OnDestroy {
     }
 
     selectNode(node: TreeFlatNode<FlatResource>) {
-        if (node.data.type === ResourceType.SHORTCUT) {
-            this._store.foldersAndShortcuts$.subscribe(nodes => {
-                const nodeRef = nodes.find(n => n.data.id === node.data.shortcutRefId);
-                this._store.updateSelectedNode(nodeRef);
-                this._router.navigate([], {
-                    queryParams: { selectedNodeId: nodeRef.data.id },
-                    queryParamsHandling: 'merge'
-                });
-            });
-        } else {
-            this._store.updateSelectedNode(node);
-            this._router.navigate([], {
-                queryParams: { selectedNodeId: node.data.id },
-                queryParamsHandling: 'merge'
-            });
-        }
+        this._store.updateSelectedNode(node);
+        this._router.navigate([], {
+            queryParams: { selectedNodeId: node?.data.id },
+            queryParamsHandling: 'merge'
+        });
     }
 
     openDialog(resource?: FlatResource) {

@@ -19,7 +19,7 @@ export class UploadFileComponent implements OnDestroy {
         if (value) {
             this.form.patchValue(value);
             if (value.id) {
-                this.form.get('type')
+                this.form.get('type').disable();
             }
         }
     }

@@ -26,7 +26,7 @@ export class FileExplorerStoreService {
         private readonly _transloco: TranslocoService
     ) {
         this.foldersAndShortcuts$ = this.nodes$.pipe(
-            map(nodes => nodes.filter(n => [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(n.data.type)))
+            map(nodes => nodes.filter(n => this._isFolderOrShortcut(n.data.type)))
         );
 
         // the breadcrumbs are a combination of selected node and all of it's parent nodes
@@ -46,8 +46,18 @@ export class FileExplorerStoreService {
         ).subscribe(nodes => this._nodesSubject.next(nodes));
     }
 
+    /** 
+     * Updates 'selectedNode' in the store. 
+     * If node type is 'ResourceType.SHORTCUT' find the shortcut reference folder and sets it as 'selectedNode',
+     * else sets the node as 'selectedNode'.
+     */
     updateSelectedNode(node: TreeFlatNode) {
-        this._selectedNodeSubject.next(node);
+        if (node?.data.type === ResourceType.SHORTCUT) {
+            const nodeRef = this._nodesSubject.value.find(n => n.data.id === node.data.shortcutRefId);
+            this._selectedNodeSubject.next(nodeRef);
+        } else {
+            this._selectedNodeSubject.next(node);
+        }
     }
 
     /** If the resource has 'id' updates the resource and it's children, else inserts the resource (mapped as node) */
@@ -80,7 +90,7 @@ export class FileExplorerStoreService {
             }
         } else {
             // if this node is placed as a first child, update 'expandable' to for the parent
-            if (parentNode && [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(resource.type)) {
+            if (parentNode && this._isFolderOrShortcut(resource.type)) {
                 parentNode.expandable = true;
             }
             newNode.data.id = resource.id || this._randomId; // simulate new id
@@ -139,7 +149,9 @@ export class FileExplorerStoreService {
     /** Deletes the node and all the children for the node. */
     deleteNode(node: TreeFlatNode<FlatResource>) {
         const deletedNodes = [
-            ...treeFlatNodeFindAllChildren<FlatResource>(node, this._nodesSubject.value),
+            ...this._isFolderOrShortcut(node.data.type)
+                ? treeFlatNodeFindAllChildren<FlatResource>(node, this._nodesSubject.value)
+                : [],
             node,
         ];
 
@@ -203,7 +215,7 @@ export class FileExplorerStoreService {
 
         // find all child nodes of the previous parent node
         const parentNodeChildFolders = treeFlatNodeFindAllChildren(prevNodeParent, this._nodesSubject.value)
-            .filter(n => [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(n.data.type));
+            .filter(n => this._isFolderOrShortcut(n.data.type));
         // if the previous parent node has no child folders update 'expandable' to false
         if (parentNodeChildFolders.length === 0) {
             prevNodeParent.expandable = false;
@@ -211,5 +223,9 @@ export class FileExplorerStoreService {
 
         const result = insertAtIndex(this._nodesSubject.value, parentNodeIndex + 1, newNodes);
         this._nodesSubject.next(result);
+    }
+
+    private _isFolderOrShortcut(type: ResourceType): boolean {
+        return [ResourceType.FOLDER, ResourceType.SHORTCUT].includes(type);
     }
 }
