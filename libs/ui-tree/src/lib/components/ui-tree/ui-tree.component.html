@@ -11,5 +11,8 @@
         <mat-icon></mat-icon>
     </button>
 
-    <span>{{node.name}}</span>
+    <ng-template *ngIf='uiTreeNodeTemplate' [ngTemplateOutlet]='uiTreeNodeTemplate.templateRef'
+        [ngTemplateOutletContext]='{data: node.data}'>
+    </ng-template>
+    <span *ngIf='!uiTreeNodeTemplate'>{{node.name}}</span>
 </div>

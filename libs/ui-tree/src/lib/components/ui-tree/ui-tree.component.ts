@@ -1,9 +1,10 @@
-import { EventEmitter, OnDestroy, Output } from '@angular/core';
+import { ContentChild, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TreeFlatNode } from '@demo-project/domains';
 import { BehaviorSubject, Observable, combineLatest, Subject } from 'rxjs';
-import { map, takeUntil, take } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { treeFlatNodeFindAllParents } from '@demo-project/utils';
+import { UiTreeNodeDirective } from '../../directives/ui-tree-node.directive';
 
 @Component({
     selector: 'ui-tree',
@@ -12,6 +13,8 @@ import { treeFlatNodeFindAllParents } from '@demo-project/utils';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiTreeComponent implements OnDestroy {
+
+    @ContentChild(UiTreeNodeDirective) readonly uiTreeNodeTemplate: UiTreeNodeDirective;
 
     @Input() set nodes(value: TreeFlatNode[]) {
         this._nodesSubject.next(Array.isArray(value) ? value : []);

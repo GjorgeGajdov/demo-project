@@ -5,7 +5,7 @@
             (click)='openDialog()'>{{'labels.uploadFile' | transloco}}</button>
         <ui-tree [nodes]='foldersAndShortcuts$ | async' [selectedNode]='selectedNode$ | async'
             [compareWith]='compareNodes' (selectedNodeChange)='selectNode($event)'>
-            <!-- <ng-template uiNodeTemplate> -->
+            <!-- <ng-template uiTreeNode let-data='data'>{{data.name}}</ng-template> -->
         </ui-tree>
 
         <div class="resize-handle-right" mwlResizeHandle [resizeEdges]="{ right: true }"></div>
